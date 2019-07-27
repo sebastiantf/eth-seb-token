@@ -30,4 +30,27 @@ contract("SebToken", function(accounts) {
         assert(adminBalance.toNumber(), 1000000, "Admin account balance is not 1000000");
       });
   });
+
+  it("transfers ownership of tokens", function() {
+    return SebToken.deployed()
+      .then(function(i) {
+        tokenInstance = i;
+        return tokenInstance.transfer.call(accounts[1], 999999999);
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+        return tokenInstance.transfer(accounts[1], 250000);
+      })
+      .then(function(receipt) {
+        return tokenInstance.balanceOf(accounts[1]);
+      })
+      .then(function(receiverBalance) {
+        assert(receiverBalance, 250000, "tokens not added to receiver account");
+        return tokenInstance.balanceOf(accounts[0]);
+      })
+      .then(function(senderBalance) {
+        assert(senderBalance, 750000, "tokens not deducted from sender account");
+      });
+  });
 });
