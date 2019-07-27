@@ -43,6 +43,11 @@ contract("SebToken", function(accounts) {
         return tokenInstance.transfer(accounts[1], 250000);
       })
       .then(function(receipt) {
+        assert.equal(receipt.logs.length, 1, "there must be one event");
+        assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
+        assert.equal(receipt.logs[0].args._from, accounts[0], "logs sender account");
+        assert.equal(receipt.logs[0].args._to, accounts[1], "logs receiver account");
+        assert.equal(receipt.logs[0].args._value, 250000, "logs transfer amount");
         return tokenInstance.balanceOf(accounts[1]);
       })
       .then(function(receiverBalance) {
