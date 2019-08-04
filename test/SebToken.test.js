@@ -62,4 +62,27 @@ contract("SebToken", function(accounts) {
         assert(senderBalance, 750000, "tokens not deducted from sender account");
       });
   });
+
+  it("approves tokens for delegated transfer", function() {
+    return SebToken.deployed()
+      .then(function(i) {
+        tokenInstance = i;
+        return tokenInstance.approve.call(accounts[1], 100);
+      })
+      .then(function(success) {
+        assert.equal(success, true, "it returns true if successful");
+        return tokenInstance.approve(accounts[1], 100);
+      })
+      .then(function(receipt) {
+        assert.equal(receipt.logs.length, 1, "there must be one event");
+        assert.equal(receipt.logs[0].event, "Approval", "must be Approval event");
+        assert.equal(receipt.logs[0].args._owner, accounts[0], "logs owner account");
+        assert.equal(receipt.logs[0].args._spender, accounts[1], "logs spender account");
+        assert.equal(receipt.logs[0].args._value, 100, "logs allowance amount");
+        return tokenInstance.allowance(accounts[0], accounts[1]);
+      })
+      .then(function(allowance) {
+        assert.equal(allowance.toNumber(), 100, "allowance not set correctly");
+      });
+  });
 });

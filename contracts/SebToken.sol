@@ -6,10 +6,17 @@ contract SebToken {
     uint256 public totalSupply;         // required
 
     mapping(address => uint256) public balanceOf; // required
+    mapping(address => mapping(address => uint256)) public allowance;
 
     event Transfer(     // required
         address indexed _from,
         address indexed _to,
+        uint256 _value
+    );
+
+    event Approval(     // required
+        address indexed _owner,
+        address indexed _spender,
         uint256 _value
     );
 
@@ -27,5 +34,13 @@ contract SebToken {
         emit Transfer(msg.sender, _to, _value);     // required
 
         return true;    // required
+    }
+
+    function approve(address _spender, uint256 _value) public returns (bool success) {  // required
+        allowance[msg.sender][_spender] = _value;
+
+        emit Approval(msg.sender, _spender, _value);
+
+        return true;
     }
 }
