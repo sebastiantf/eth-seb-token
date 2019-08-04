@@ -8,6 +8,11 @@ contract SebTokenSale {
     uint256 public tokenPrice;
     uint256 public tokensSold;
 
+    event Sell(
+        address _buyer,
+        uint256 _numberOfTokens
+    );
+
     constructor(SebToken _tokenContract, uint256 _tokenPrice) public {
         // Assign Admin
         admin = msg.sender;
@@ -28,5 +33,6 @@ contract SebTokenSale {
         tokensSold += _numberOfTokens;
 
         // Sell Event
+        emit Sell(msg.sender, _numberOfTokens);
     }
 }
