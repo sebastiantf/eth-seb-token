@@ -45,7 +45,7 @@ contract("SebToken", function(accounts) {
       .then(function(success) {
         assert(success, true, "it returns true if successful");
         return tokenInstance.transfer(accounts[1], 250000);
-      })
+      }) // receipt contains events emitted
       .then(function(receipt) {
         assert.equal(receipt.logs.length, 1, "there must be one event");
         assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
@@ -83,6 +83,61 @@ contract("SebToken", function(accounts) {
       })
       .then(function(allowance) {
         assert.equal(allowance.toNumber(), 100, "allowance not set correctly");
+      });
+  });
+
+  it("performs delegated transfers", function() {
+    return SebToken.deployed()
+      .then(function(i) {
+        tokenInstance = i;
+        fromAccount = accounts[2];
+        toAccount = accounts[3];
+        spenderAccount = accounts[4];
+        // Send init balance tokens to fromAccount
+        return tokenInstance.transfer(fromAccount, 100, { from: accounts[0] });
+      })
+      .then(function(receipt) {
+        // Approve spenderAccount to transfer max 10 tokens fromAccount -> toAccount
+        return tokenInstance.approve(spenderAccount, 10, { from: fromAccount });
+      })
+      .then(function(receipt) {
+        // Try transferFrom tokens more than fromAccount balance
+        return tokenInstance.transferFrom(fromAccount, toAccount, 999, { from: spenderAccount });
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+        // Try transferFrom tokens more than allowance
+        return tokenInstance.transferFrom(fromAccount, toAccount, 20, { from: spenderAccount });
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+        // Check if true returned
+        return tokenInstance.transferFrom.call(fromAccount, toAccount, 10, { from: spenderAccount });
+      })
+      .then(function(success) {
+        assert.equal(success, true);
+        return tokenInstance.transferFrom(fromAccount, toAccount, 10, { from: spenderAccount });
+      })
+      .then(function(receipt) {
+        assert.equal(receipt.logs.length, 1, "there must be one event");
+        assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
+        assert.equal(receipt.logs[0].args._from, fromAccount, "logs sender account");
+        assert.equal(receipt.logs[0].args._to, toAccount, "logs receiver account");
+        assert.equal(receipt.logs[0].args._value, 10, "logs transfer amount");
+        return tokenInstance.balanceOf(fromAccount);
+      })
+      .then(function(senderBalance) {
+        assert.equal(senderBalance.toNumber(), 90, "tokens not deducted from sender account");
+        return tokenInstance.balanceOf(toAccount);
+      })
+      .then(function(receiverBalance) {
+        assert.equal(receiverBalance.toNumber(), 10, "tokens not added to receiver account");
+        return tokenInstance.allowance(fromAccount, spenderAccount);
+      })
+      .then(function(allowance) {
+        assert.equal(allowance.toNumber(), 0, "allowance not updated");
       });
   });
 });

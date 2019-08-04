@@ -43,4 +43,25 @@ contract SebToken {
 
         return true;
     }
+
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+        // Require _from has enough balance
+        require(balanceOf[_from] >= _value, '');
+
+        // Require _value within allowance
+        require(allowance[_from][msg.sender] >= _value, '');
+
+        // Update balance
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
+
+        // Update allowance
+        allowance[_from][msg.sender] -= _value;
+
+        // Transfer event
+        emit Transfer(_from, _to, _value);
+
+        // return true
+        return true;
+    }
 }
