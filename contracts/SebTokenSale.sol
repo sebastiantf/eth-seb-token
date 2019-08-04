@@ -13,6 +13,10 @@ contract SebTokenSale {
         uint256 _numberOfTokens
     );
 
+    function multiply(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
+    }
+
     constructor(SebToken _tokenContract, uint256 _tokenPrice) public {
         // Assign Admin
         admin = msg.sender;
@@ -26,6 +30,8 @@ contract SebTokenSale {
 
     function buyTokens(uint256 _numberOfTokens) public payable {
         // Require value = tokens
+        require(msg.value == multiply(_numberOfTokens, tokenPrice), '');
+        
         // Require contract has enough tokens
         // Require that transfer is successful
 

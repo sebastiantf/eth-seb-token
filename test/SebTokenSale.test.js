@@ -43,6 +43,12 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(function(sold) {
         assert.equal(sold.toNumber(), numberOfTokens, "tokensSold not equal to numberOfTokens bought");
+        // Try selling tokens different from actual ether value
+        return tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: 1 });
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "tokens and value must be equal");
       });
   });
 });
