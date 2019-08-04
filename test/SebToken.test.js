@@ -40,6 +40,10 @@ contract("SebToken", function(accounts) {
       .then(assert.fail)
       .catch(function(error) {
         assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+        return tokenInstance.transfer.call(accounts[1], 250000);
+      })
+      .then(function(success) {
+        assert(success, true, "it returns true if successful");
         return tokenInstance.transfer(accounts[1], 250000);
       })
       .then(function(receipt) {

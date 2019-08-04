@@ -25,5 +25,7 @@ contract SebToken {
         balanceOf[_to] += _value;
 
         emit Transfer(msg.sender, _to, _value);     // required
+
+        return true;    // required
     }
 }
