@@ -1,10 +1,11 @@
 const SebTokenSale = artifacts.require("./SebTokenSale.sol");
 
 contract("SebTokenSale", function(accounts) {
+  var tokenSaleInstance;
   var tokenPrice = 1000000000000000; // Token price in wei = 0.001 ETH
-  var numberOfTokens;
-  var buyer;
-  var value;
+  var numberOfTokens = 10;
+  var buyer = accounts[1];
+  var value = numberOfTokens * tokenPrice;
 
   it("deploys and initializes correctly", function() {
     return SebTokenSale.deployed()
@@ -29,9 +30,6 @@ contract("SebTokenSale", function(accounts) {
     return SebTokenSale.deployed()
       .then(function(i) {
         tokenSaleInstance = i;
-        buyer = accounts[1];
-        numberOfTokens = 10;
-        value = numberOfTokens * tokenPrice;
         return tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: value });
       })
       .then(function(receipt) {
