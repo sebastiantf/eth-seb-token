@@ -33,6 +33,8 @@ contract SebTokenSale {
         require(msg.value == multiply(_numberOfTokens, tokenPrice), '');
         
         // Require contract has enough tokens
+        require(tokenContract.balanceOf(address(this)) >= _numberOfTokens, '');
+        
         // Require that transfer is successful
 
         // Track tokensSold

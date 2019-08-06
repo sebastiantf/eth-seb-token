@@ -1,11 +1,16 @@
+const SebToken = artifacts.require("./SebToken.sol");
 const SebTokenSale = artifacts.require("./SebTokenSale.sol");
 
 contract("SebTokenSale", function(accounts) {
+  var tokenInstance;
   var tokenSaleInstance;
   var tokenPrice = 1000000000000000; // Token price in wei = 0.001 ETH
   var numberOfTokens = 10;
   var buyer = accounts[1];
   var value = numberOfTokens * tokenPrice;
+
+  var provisionedTokens = 750000;
+  var admin = accounts[0];
 
   it("deploys and initializes correctly", function() {
     return SebTokenSale.deployed()
@@ -27,9 +32,17 @@ contract("SebTokenSale", function(accounts) {
   });
 
   it("facilitates buying tokens", function() {
-    return SebTokenSale.deployed()
+    return SebToken.deployed()
+      .then(function(i) {
+        tokenInstance = i;
+        return SebTokenSale.deployed();
+      })
       .then(function(i) {
         tokenSaleInstance = i;
+        // Provision some tokens for tokenSale contract
+        return tokenInstance.transfer(tokenSaleInstance.address, provisionedTokens, { from: admin });
+      })
+      .then(function(receipt) {
         return tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: value });
       })
       .then(function(receipt) {
@@ -47,6 +60,13 @@ contract("SebTokenSale", function(accounts) {
       .then(assert.fail)
       .catch(function(error) {
         assert(error.message.indexOf("revert") >= 0, "tokens and value must be equal");
+        // Try buying more tokens than provisionedTokens
+        return tokenSaleInstance.buyTokens(800000, { from: buyer, value: value });
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        console.log(error.message);
+        assert(error.message.indexOf("revert") >= 0, "cannot buy more tokens than provisionedTokens");
       });
   });
 });
