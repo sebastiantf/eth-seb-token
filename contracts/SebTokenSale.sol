@@ -36,6 +36,7 @@ contract SebTokenSale {
         require(tokenContract.balanceOf(address(this)) >= _numberOfTokens, '');
         
         // Require that transfer is successful
+        require(tokenContract.transfer(msg.sender, _numberOfTokens), '');
 
         // Track tokensSold
         tokensSold += _numberOfTokens;

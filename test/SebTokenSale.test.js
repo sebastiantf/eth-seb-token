@@ -54,6 +54,15 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(function(sold) {
         assert.equal(sold.toNumber(), numberOfTokens, "tokensSold not equal to numberOfTokens bought");
+        // Check balance of buyer and tokenSale contract updated
+        return tokenInstance.balanceOf(buyer);
+      })
+      .then(function(buyerBalance) {
+        assert.equal(buyerBalance, numberOfTokens, "balanceOf buyer not updated");
+        return tokenInstance.balanceOf(tokenSaleInstance.address);
+      })
+      .then(function(contractBalance) {
+        assert.equal(contractBalance, provisionedTokens - numberOfTokens, "balanceOf tokenSale not updated");
         // Try selling tokens different from actual ether value
         return tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: 1 });
       })
@@ -65,7 +74,7 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(assert.fail)
       .catch(function(error) {
-        console.log(error.message);
+        // console.log(error.message);
         assert(error.message.indexOf("revert") >= 0, "cannot buy more tokens than provisionedTokens");
       });
   });
