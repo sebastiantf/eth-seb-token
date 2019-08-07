@@ -97,7 +97,10 @@ contract("SebTokenSale", function(accounts) {
         return tokenSaleInstance.endSale({ from: admin });
       })
       .then(function(receipt) {
-        // success
+        return tokenInstance.balanceOf(admin);
+      })
+      .then(function(adminBalance) {
+        assert.equal(adminBalance.toNumber(), 999990, "remaining tokens not returned to admin");
       });
   });
 });

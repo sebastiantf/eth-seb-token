@@ -48,8 +48,10 @@ contract SebTokenSale {
     function endSale() public {
         // Require admin to endSale
         require(msg.sender == admin, '');
-        
+
         // Return remaining tokens to admin
+        require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
+        
         // Destroy contract
     }
 }
