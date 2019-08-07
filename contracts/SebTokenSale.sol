@@ -51,7 +51,8 @@ contract SebTokenSale {
 
         // Return remaining tokens to admin
         require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
-        
-        // Destroy contract
+
+        // Destroy contract. Actually just transfer remaining tokens to admin
+        // admin.transfer(address(this).balance);
     }
 }

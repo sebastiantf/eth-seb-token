@@ -101,6 +101,11 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(function(adminBalance) {
         assert.equal(adminBalance.toNumber(), 999990, "remaining tokens not returned to admin");
+        // Check that the contract has no balance
+        return tokenInstance.balanceOf(tokenSaleInstance.address);
+      })
+      .then(function(contractBalance) {
+        assert.equal(contractBalance.toNumber(), 0);
       });
   });
 });
