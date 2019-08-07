@@ -44,4 +44,12 @@ contract SebTokenSale {
         // Sell Event
         emit Sell(msg.sender, _numberOfTokens);
     }
+
+    function endSale() public {
+        // Require admin to endSale
+        require(msg.sender == admin, '');
+        
+        // Return remaining tokens to admin
+        // Destroy contract
+    }
 }
