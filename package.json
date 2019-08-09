@@ -4,7 +4,8 @@
   "description": "An ERC-20 token implementation using Ethereum smart contracts in Solidity and Truffle Suite",
   "main": "truffle-config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "lite-server"
   },
   "keywords": [
     "ethereum",
@@ -16,6 +17,9 @@
   "author": "Sebastian T F",
   "license": "ISC",
   "devDependencies": {
-    "truffle": "^5.0.29"
+    "bootstrap": "^3.4.1",
+    "lite-server": "^2.5.3",
+    "truffle": "^5.0.29",
+    "truffle-contract": "^4.0.28"
   }
 }
