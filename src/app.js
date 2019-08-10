@@ -1,5 +1,6 @@
 App = {
   contracts: {},
+  account: "0x0",
 
   init: function() {
     console.log("App initializing...");
@@ -35,7 +36,20 @@ App = {
         App.contracts.SebToken.deployed().then(function(sebToken) {
           console.log("SebToken contract address: ", sebToken.address);
         });
+        return App.render();
       });
+    });
+  },
+
+  render: function() {
+    web3.eth.getCoinbase(function(error, account) {
+      if (error === null) {
+        App.account = account;
+        $(".account-address").html(account);
+        console.log("Connected Account: ", account);
+      } else {
+        console.log(error);
+      }
     });
   }
 };
