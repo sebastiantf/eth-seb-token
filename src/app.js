@@ -1,4 +1,6 @@
 App = {
+  contracts: {},
+
   init: function() {
     console.log("App initializing...");
     return App.initWeb3();
@@ -16,6 +18,25 @@ App = {
       web3 = new Web3(App.web3Provider);
       console.log("new Web3(): ", web3, web3.currentProvider);
     }
+    return App.initContracts();
+  },
+
+  initContracts: function() {
+    $.getJSON("SebTokenSale.json", function(sebTokenSale) {
+      App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
+      App.contracts.SebTokenSale.setProvider(App.web3Provider);
+      App.contracts.SebTokenSale.deployed().then(function(sebTokenSale) {
+        console.log("SebTokenSale contract address: ", sebTokenSale.address);
+      });
+    }).done(function() {
+      $.getJSON("SebToken.json", function(sebToken) {
+        App.contracts.SebToken = TruffleContract(sebToken);
+        App.contracts.SebToken.setProvider(App.web3Provider);
+        App.contracts.SebToken.deployed().then(function(sebToken) {
+          console.log("SebToken contract address: ", sebToken.address);
+        });
+      });
+    });
   }
 };
 
