@@ -30,10 +30,11 @@
                     <p>Introducing SebToken (SEB)</p>
                     <p>Token Price is <span class="token-price"></span> ETH. You currently have <span
                             class="token-balance"></span> SEBs</p><br>
-                    <form>
+                    <form onsubmit="App.buyTokens(); return false;">
                         <div class="form-group">
                             <div class="input-group">
-                                <input type="number" class="form-control input-lg" pattern="[0-9]" value="1" min="1">
+                                <input id="numberOfTokens" type="number" class="form-control input-lg" pattern="[0-9]"
+                                    value="1" min="1">
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-primary btn-lg">Buy
                                         Tokens</button>

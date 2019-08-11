@@ -102,6 +102,26 @@ App = {
             loader.hide();
           });
       });
+  },
+
+  buyTokens: function() {
+    var loader = $("#loader");
+    var content = $("#content");
+    content.hide();
+    loader.show();
+
+    var numberOfTokens = $("#numberOfTokens").val();
+    App.contracts.SebTokenSale.deployed()
+      .then(function(instance) {
+        return instance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
+      })
+      .then(function(result) {
+        console.log("Tokens bought!");
+        $("form").trigger("reset");
+
+        content.show();
+        loader.hide();
+      });
   }
 };
 
