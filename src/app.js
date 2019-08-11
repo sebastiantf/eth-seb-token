@@ -40,8 +40,24 @@ App = {
         App.contracts.SebToken.deployed().then(function(sebToken) {
           console.log("SebToken contract address: ", sebToken.address);
         });
+
+        App.listenForEvents();
         return App.render();
       });
+    });
+  },
+
+  listenForEvents: function() {
+    App.contracts.SebTokenSale.deployed().then(function(instance) {
+      return instance.Sell(
+        {
+          fromBlock: 0
+        },
+        function(error, event) {
+          console.log("event triggered", event.event);
+          App.render();
+        }
+      );
     });
   },
 
@@ -119,8 +135,8 @@ App = {
         console.log("Tokens bought!");
         $("form").trigger("reset");
 
-        content.show();
-        loader.hide();
+        // content.show();
+        // loader.hide();
       });
   }
 };
