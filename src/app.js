@@ -96,12 +96,12 @@ App = {
           .then(function(balance) {
             console.log("Balance: ", balance.toNumber());
             $(".token-balance").html(balance.toNumber());
+
+            App.loading = false;
+            content.show();
+            loader.hide();
           });
       });
-
-    App.loading = false;
-    content.show();
-    loader.hide();
   }
 };
 
