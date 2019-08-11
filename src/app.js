@@ -2,6 +2,9 @@ App = {
   contracts: {},
   account: "0x0",
   loading: false,
+  tokenPrice: 1000000000000000,
+  tokensSold: 0,
+  tokensProvisioned: 750000,
 
   init: function() {
     console.log("App initializing...");
@@ -63,6 +66,38 @@ App = {
         console.log(error);
       }
     });
+
+    App.contracts.SebTokenSale.deployed()
+      .then(function(instance) {
+        sebTokenSaleInstance = instance;
+        return sebTokenSaleInstance.tokenPrice();
+      })
+      .then(function(tokenPrice) {
+        App.tokenPrice = tokenPrice;
+        $(".token-price").html(web3.fromWei(App.tokenPrice.toNumber(), "ether"));
+        return sebTokenSaleInstance.tokensSold();
+      })
+      .then(function(tokensSold) {
+        App.tokensSold = tokensSold.toNumber();
+        $(".tokens-sold").html(App.tokensSold);
+        $(".tokens-provisioned").html(App.tokensProvisioned);
+
+        var progressBarPercent = (App.tokensSold / App.tokensProvisioned) * 100;
+        console.log("Progress: ", progressBarPercent);
+        $(".progress-bar")
+          .css("width", progressBarPercent + "%")
+          .html(Math.ceil(progressBarPercent) + "%");
+
+        App.contracts.SebToken.deployed()
+          .then(function(instance) {
+            sebTokenInstance = instance;
+            return sebTokenInstance.balanceOf(App.account);
+          })
+          .then(function(balance) {
+            console.log("Balance: ", balance.toNumber());
+            $(".token-balance").html(balance.toNumber());
+          });
+      });
 
     App.loading = false;
     content.show();
