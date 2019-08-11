@@ -1,6 +1,7 @@
 App = {
   contracts: {},
   account: "0x0",
+  loading: false,
 
   init: function() {
     console.log("App initializing...");
@@ -42,6 +43,17 @@ App = {
   },
 
   render: function() {
+    if (App.loading) {
+      return;
+    }
+
+    App.loading = true;
+
+    var loader = $("#loader");
+    var content = $("#content");
+    content.hide();
+    loader.show();
+
     web3.eth.getCoinbase(function(error, account) {
       if (error === null) {
         App.account = account;
@@ -51,6 +63,10 @@ App = {
         console.log(error);
       }
     });
+
+    App.loading = false;
+    content.show();
+    loader.hide();
   }
 };
 
