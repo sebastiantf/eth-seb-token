@@ -26,8 +26,27 @@ App = {
     return App.initContracts();
   },
 
-  initContracts: function() {
-    $.getJSON("SebTokenSale.json", function(sebTokenSale) {
+  initContracts: async function() {
+    var sebTokenSale = await $.getJSON("SebTokenSale.json");
+    App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
+    App.contracts.SebTokenSale.setProvider(App.web3Provider);
+
+    sebTokenSale = await App.contracts.SebTokenSale.deployed();
+
+    console.log("SebTokenSale contract address: ", sebTokenSale.address);
+
+    var sebToken = await $.getJSON("SebToken.json");
+    App.contracts.SebToken = TruffleContract(sebToken);
+    App.contracts.SebToken.setProvider(App.web3Provider);
+
+    sebToken = await App.contracts.SebToken.deployed();
+
+    console.log("SebToken contract address: ", sebToken.address);
+
+    App.listenForEvents();
+    return App.render();
+
+    /* $.getJSON("SebTokenSale.json", function(sebTokenSale) {
       App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
       App.contracts.SebTokenSale.setProvider(App.web3Provider);
       App.contracts.SebTokenSale.deployed().then(function(sebTokenSale) {
@@ -44,7 +63,7 @@ App = {
         App.listenForEvents();
         return App.render();
       });
-    });
+    }); */
   },
 
   listenForEvents: function() {
