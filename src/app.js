@@ -66,8 +66,20 @@ App = {
     }); */
   },
 
-  listenForEvents: function() {
-    App.contracts.SebTokenSale.deployed().then(function(instance) {
+  listenForEvents: async function() {
+    var sebTokenSale = await App.contracts.SebTokenSale.deployed();
+
+    sebTokenSale.Sell(
+      {
+        fromBlock: 0
+      },
+      function(error, event) {
+        console.log("event triggered", event.event);
+        App.render();
+      }
+    );
+
+    /* App.contracts.SebTokenSale.deployed().then(function(instance) {
       return instance.Sell(
         {
           fromBlock: 0
@@ -77,7 +89,7 @@ App = {
           App.render();
         }
       );
-    });
+    }); */
   },
 
   render: function() {
