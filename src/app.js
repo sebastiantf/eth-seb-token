@@ -174,14 +174,20 @@ App = {
       }); */
   },
 
-  buyTokens: function() {
+  buyTokens: async function() {
     var loader = $("#loader");
     var content = $("#content");
     content.hide();
     loader.show();
 
     var numberOfTokens = $("#numberOfTokens").val();
-    App.contracts.SebTokenSale.deployed()
+
+    var sebTokenSaleInstance = await App.contracts.SebTokenSale.deployed();
+    await sebTokenSaleInstance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
+    console.log("Tokens bought!");
+    $("form").trigger("reset");
+
+    /* App.contracts.SebTokenSale.deployed()
       .then(function(instance) {
         return instance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
       })
@@ -191,7 +197,7 @@ App = {
 
         // content.show();
         // loader.hide();
-      });
+      }); */
   }
 };
 
