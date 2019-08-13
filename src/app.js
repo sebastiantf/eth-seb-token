@@ -92,7 +92,7 @@ App = {
     }); */
   },
 
-  render: function() {
+  render: async function() {
     if (App.loading) {
       return;
     }
@@ -114,7 +114,30 @@ App = {
       }
     });
 
-    App.contracts.SebTokenSale.deployed()
+    var sebTokenSaleInstance = await App.contracts.SebTokenSale.deployed();
+    App.tokenPrice = await sebTokenSaleInstance.tokenPrice();
+    $(".token-price").html(web3.fromWei(App.tokenPrice.toNumber(), "ether"));
+
+    App.tokensSold = (await sebTokenSaleInstance.tokensSold()).toNumber();
+    $(".tokens-sold").html(App.tokensSold);
+    $(".tokens-provisioned").html(App.tokensProvisioned);
+
+    var progressBarPercent = (App.tokensSold / App.tokensProvisioned) * 100;
+    console.log("Progress: ", progressBarPercent);
+    $(".progress-bar")
+      .css("width", progressBarPercent + "%")
+      .html(Math.ceil(progressBarPercent) + "%");
+
+    var sebTokenInstance = await App.contracts.SebToken.deployed();
+    var balance = await sebTokenInstance.balanceOf(App.account);
+
+    console.log("Balance: ", balance.toNumber());
+    $(".token-balance").html(balance.toNumber());
+    App.loading = false;
+    content.show();
+    loader.hide();
+
+    /* App.contracts.SebTokenSale.deployed()
       .then(function(instance) {
         sebTokenSaleInstance = instance;
         return sebTokenSaleInstance.tokenPrice();
@@ -148,7 +171,7 @@ App = {
             content.show();
             loader.hide();
           });
-      });
+      }); */
   },
 
   buyTokens: function() {
