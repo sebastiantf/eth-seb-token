@@ -11,8 +11,8 @@ App = {
     return App.initWeb3();
   },
 
-  initWeb3: function() {
-    if (typeof web3 !== "undefined") {
+  initWeb3: async function() {
+    /* if (typeof web3 !== "undefined") {
       console.log("There is web3 injected by MetaMask: ", web3);
       App.web3Provider = web3.currentProvider;
       web3 = new Web3(web3.currentProvider);
@@ -22,6 +22,35 @@ App = {
       App.web3Provider = new Web3.providers.HttpProvider("http://localhost:8545");
       web3 = new Web3(App.web3Provider);
       console.log("new Web3(): ", web3, web3.currentProvider);
+    } */
+
+    // Update for MetaMask Privacy Mode: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
+    // Modern dapp browsers...
+    if (window.ethereum) {
+      window.web3 = new Web3(ethereum);
+      try {
+        // Request account access if needed
+        await ethereum.enable();
+        // Accounts now exposed
+        // web3.eth.sendTransaction({
+        //   /* ... */
+        // });
+      } catch (error) {
+        // User denied account access...
+        console.log(error.message);
+      }
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+      window.web3 = new Web3(web3.currentProvider);
+      // Accounts always exposed
+      // web3.eth.sendTransaction({
+      //   /* ... */
+      // });
+    }
+    // Non-dapp browsers...
+    else {
+      console.log("Non-Ethereum browser detected. You should consider trying MetaMask!");
     }
     return App.initContracts();
   },
@@ -29,7 +58,7 @@ App = {
   initContracts: async function() {
     var sebTokenSale = await $.getJSON("SebTokenSale.json");
     App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
-    App.contracts.SebTokenSale.setProvider(App.web3Provider);
+    App.contracts.SebTokenSale.setProvider(window.ethereum);
 
     sebTokenSale = await App.contracts.SebTokenSale.deployed();
 
@@ -37,7 +66,7 @@ App = {
 
     var sebToken = await $.getJSON("SebToken.json");
     App.contracts.SebToken = TruffleContract(sebToken);
-    App.contracts.SebToken.setProvider(App.web3Provider);
+    App.contracts.SebToken.setProvider(window.ethereum);
 
     sebToken = await App.contracts.SebToken.deployed();
 
