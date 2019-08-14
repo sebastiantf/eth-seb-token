@@ -108,6 +108,11 @@ App = {
       }
     );
 
+    ethereum.on("accountsChanged", function(accounts) {
+      console.log("Account changed");
+      App.render();
+    });
+
     /* App.contracts.SebTokenSale.deployed().then(function(instance) {
       return instance.Sell(
         {
