@@ -6,9 +6,11 @@ App = {
   tokensSold: 0,
   tokensProvisioned: 750000,
 
-  init: function() {
+  init: async function() {
     console.log("App initializing...");
-    return App.initWeb3();
+    await App.initWeb3();
+    await App.initContracts();
+    await App.render();
   },
 
   initWeb3: async function() {
@@ -52,7 +54,6 @@ App = {
     else {
       console.log("Non-Ethereum browser detected. You should consider trying MetaMask!");
     }
-    return App.initContracts();
   },
 
   initContracts: async function() {
@@ -73,7 +74,6 @@ App = {
     console.log("SebToken contract address: ", sebToken.address);
 
     App.listenForEvents();
-    return App.render();
 
     /* $.getJSON("SebTokenSale.json", function(sebTokenSale) {
       App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
