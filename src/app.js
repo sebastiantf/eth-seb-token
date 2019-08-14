@@ -14,18 +14,6 @@ App = {
   },
 
   initWeb3: async function() {
-    /* if (typeof web3 !== "undefined") {
-      console.log("There is web3 injected by MetaMask: ", web3);
-      App.web3Provider = web3.currentProvider;
-      web3 = new Web3(web3.currentProvider);
-      console.log("new Web3(): ", web3, web3.currentProvider);
-    } else {
-      console.log("No web3 found. Creating new Web3()");
-      App.web3Provider = new Web3.providers.HttpProvider("http://localhost:8545");
-      web3 = new Web3(App.web3Provider);
-      console.log("new Web3(): ", web3, web3.currentProvider);
-    } */
-
     // Update for MetaMask Privacy Mode: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
     // Modern dapp browsers...
     if (window.ethereum) {
@@ -34,9 +22,6 @@ App = {
         // Request account access if needed
         await ethereum.enable();
         // Accounts now exposed
-        // web3.eth.sendTransaction({
-        //   /* ... */
-        // });
       } catch (error) {
         // User denied account access...
         console.log(error.message);
@@ -46,9 +31,6 @@ App = {
     else if (window.web3) {
       window.web3 = new Web3(web3.currentProvider);
       // Accounts always exposed
-      // web3.eth.sendTransaction({
-      //   /* ... */
-      // });
     }
     // Non-dapp browsers...
     else {
@@ -74,25 +56,6 @@ App = {
     console.log("SebToken contract address: ", sebToken.address);
 
     App.listenForEvents();
-
-    /* $.getJSON("SebTokenSale.json", function(sebTokenSale) {
-      App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
-      App.contracts.SebTokenSale.setProvider(App.web3Provider);
-      App.contracts.SebTokenSale.deployed().then(function(sebTokenSale) {
-        console.log("SebTokenSale contract address: ", sebTokenSale.address);
-      });
-    }).done(function() {
-      $.getJSON("SebToken.json", function(sebToken) {
-        App.contracts.SebToken = TruffleContract(sebToken);
-        App.contracts.SebToken.setProvider(App.web3Provider);
-        App.contracts.SebToken.deployed().then(function(sebToken) {
-          console.log("SebToken contract address: ", sebToken.address);
-        });
-
-        App.listenForEvents();
-        return App.render();
-      });
-    }); */
   },
 
   listenForEvents: async function() {
@@ -112,18 +75,6 @@ App = {
       console.log("Account changed");
       App.render();
     });
-
-    /* App.contracts.SebTokenSale.deployed().then(function(instance) {
-      return instance.Sell(
-        {
-          fromBlock: 0
-        },
-        function(error, event) {
-          console.log("event triggered", event.event);
-          App.render();
-        }
-      );
-    }); */
   },
 
   render: async function() {
@@ -170,42 +121,6 @@ App = {
     App.loading = false;
     content.show();
     loader.hide();
-
-    /* App.contracts.SebTokenSale.deployed()
-      .then(function(instance) {
-        sebTokenSaleInstance = instance;
-        return sebTokenSaleInstance.tokenPrice();
-      })
-      .then(function(tokenPrice) {
-        App.tokenPrice = tokenPrice;
-        $(".token-price").html(web3.fromWei(App.tokenPrice.toNumber(), "ether"));
-        return sebTokenSaleInstance.tokensSold();
-      })
-      .then(function(tokensSold) {
-        App.tokensSold = tokensSold.toNumber();
-        $(".tokens-sold").html(App.tokensSold);
-        $(".tokens-provisioned").html(App.tokensProvisioned);
-
-        var progressBarPercent = (App.tokensSold / App.tokensProvisioned) * 100;
-        console.log("Progress: ", progressBarPercent);
-        $(".progress-bar")
-          .css("width", progressBarPercent + "%")
-          .html(Math.ceil(progressBarPercent) + "%");
-
-        App.contracts.SebToken.deployed()
-          .then(function(instance) {
-            sebTokenInstance = instance;
-            return sebTokenInstance.balanceOf(App.account);
-          })
-          .then(function(balance) {
-            console.log("Balance: ", balance.toNumber());
-            $(".token-balance").html(balance.toNumber());
-
-            App.loading = false;
-            content.show();
-            loader.hide();
-          });
-      }); */
   },
 
   buyTokens: async function() {
@@ -220,18 +135,6 @@ App = {
     await sebTokenSaleInstance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
     console.log("Tokens bought!");
     $("form").trigger("reset");
-
-    /* App.contracts.SebTokenSale.deployed()
-      .then(function(instance) {
-        return instance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
-      })
-      .then(function(result) {
-        console.log("Tokens bought!");
-        $("form").trigger("reset");
-
-        // content.show();
-        // loader.hide();
-      }); */
   }
 };
 
