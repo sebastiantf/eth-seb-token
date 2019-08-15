@@ -43,25 +43,23 @@ App = {
     App.contracts.SebTokenSale = TruffleContract(sebTokenSale);
     App.contracts.SebTokenSale.setProvider(window.ethereum);
 
-    sebTokenSale = await App.contracts.SebTokenSale.deployed();
+    App.sebTokenSale = await App.contracts.SebTokenSale.deployed();
 
-    console.log("SebTokenSale contract address: ", sebTokenSale.address);
+    console.log("SebTokenSale contract address: ", App.sebTokenSale.address);
 
     var sebToken = await $.getJSON("SebToken.json");
     App.contracts.SebToken = TruffleContract(sebToken);
     App.contracts.SebToken.setProvider(window.ethereum);
 
-    sebToken = await App.contracts.SebToken.deployed();
+    App.sebToken = await App.contracts.SebToken.deployed();
 
-    console.log("SebToken contract address: ", sebToken.address);
+    console.log("SebToken contract address: ", App.sebToken.address);
 
     App.listenForEvents();
   },
 
   listenForEvents: async function() {
-    var sebTokenSale = await App.contracts.SebTokenSale.deployed();
-
-    sebTokenSale.Sell(
+    App.sebTokenSale.Sell(
       {
         fromBlock: 0
       },
@@ -99,11 +97,10 @@ App = {
       }
     });
 
-    var sebTokenSaleInstance = await App.contracts.SebTokenSale.deployed();
-    App.tokenPrice = await sebTokenSaleInstance.tokenPrice();
+    App.tokenPrice = await App.sebTokenSale.tokenPrice();
     $(".token-price").html(web3.fromWei(App.tokenPrice.toNumber(), "ether"));
 
-    App.tokensSold = (await sebTokenSaleInstance.tokensSold()).toNumber();
+    App.tokensSold = (await App.sebTokenSale.tokensSold()).toNumber();
     $(".tokens-sold").html(App.tokensSold);
     $(".tokens-provisioned").html(App.tokensProvisioned);
 
@@ -113,8 +110,7 @@ App = {
       .css("width", progressBarPercent + "%")
       .html(Math.ceil(progressBarPercent) + "%");
 
-    var sebTokenInstance = await App.contracts.SebToken.deployed();
-    var balance = await sebTokenInstance.balanceOf(App.account);
+    var balance = await App.sebToken.balanceOf(App.account);
 
     console.log("Balance: ", balance.toNumber());
     $(".token-balance").html(balance.toNumber());
@@ -131,8 +127,7 @@ App = {
 
     var numberOfTokens = $("#numberOfTokens").val();
 
-    var sebTokenSaleInstance = await App.contracts.SebTokenSale.deployed();
-    await sebTokenSaleInstance.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
+    await App.sebTokenSale.buyTokens(numberOfTokens, { from: App.account, value: numberOfTokens * App.tokenPrice, gas: 500000 });
     console.log("Tokens bought!");
     $("form").trigger("reset");
   }
