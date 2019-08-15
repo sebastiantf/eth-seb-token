@@ -34,6 +34,26 @@
         .account-address {
             font-weight: bold;
         }
+
+        .btn-info {
+            background-color: #03a9f4;
+            border-color: #03a9f4;
+        }
+
+        .btn-info:hover {
+            background-color: #039be0;
+            border-color: #027fb8;
+        }
+
+        .btn-info:active,
+        .btn-info:focus,
+        .btn-info:focus:active {
+            background-color: #29b8e4;
+            background-image: none;
+            border-color: #23bfee;
+            outline: none;
+
+        }
     </style>
 </head>
 
@@ -57,7 +77,7 @@
                                 <input id="numberOfTokens" type="number" class="form-control input-lg" pattern="[0-9]"
                                     value="1" min="1">
                                 <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary btn-lg">Buy
+                                    <button type="submit" class="btn btn-info btn-lg">Buy
                                         Tokens</button>
                                 </span>
                             </div>
