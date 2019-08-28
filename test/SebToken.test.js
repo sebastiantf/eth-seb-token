@@ -1,8 +1,18 @@
 const SebToken = artifacts.require("./SebToken.sol");
 
 contract("SebToken", function(accounts) {
-  it("initializes name and symbol", function() {
-    return SebToken.deployed()
+  before(async () => {
+    this.tokenInstance = await SebToken.deployed();
+  });
+
+  it("initializes name and symbol", async () => {
+    const name = await this.tokenInstance.name();
+    assert.equal(name, "Seb Token", "does not have correct name");
+
+    const symbol = await tokenInstance.symbol();
+    assert.equal(symbol, "SEB", "does not have correct symbol");
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         return tokenInstance.name();
@@ -13,7 +23,7 @@ contract("SebToken", function(accounts) {
       })
       .then(function(symbol) {
         assert.equal(symbol, "SEB", "does not have correct symbol");
-      });
+      }); */
   });
 
   it("sets totalSupply on deployment", function() {
