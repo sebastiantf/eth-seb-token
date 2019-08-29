@@ -102,8 +102,21 @@ contract("SebToken", function(accounts) {
       }); */
   });
 
-  it("approves tokens for delegated transfer", function() {
-    return SebToken.deployed()
+  it("approves tokens for delegated transfer", async () => {
+    const success = await this.tokenInstance.approve.call(accounts[1], 100);
+    assert.equal(success, true, "it returns true if successful");
+
+    const receipt = await this.tokenInstance.approve(accounts[1], 100);
+    assert.equal(receipt.logs.length, 1, "there must be one event");
+    assert.equal(receipt.logs[0].event, "Approval", "must be Approval event");
+    assert.equal(receipt.logs[0].args._owner, accounts[0], "logs owner account");
+    assert.equal(receipt.logs[0].args._spender, accounts[1], "logs spender account");
+    assert.equal(receipt.logs[0].args._value, 100, "logs allowance amount");
+
+    const allowance = await tokenInstance.allowance(accounts[0], accounts[1]);
+    assert.equal(allowance.toNumber(), 100, "allowance not set correctly");
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         return tokenInstance.approve.call(accounts[1], 100);
@@ -122,7 +135,7 @@ contract("SebToken", function(accounts) {
       })
       .then(function(allowance) {
         assert.equal(allowance.toNumber(), 100, "allowance not set correctly");
-      });
+      }); */
   });
 
   it("performs delegated transfers", function() {
