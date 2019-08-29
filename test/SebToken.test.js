@@ -47,8 +47,31 @@ contract("SebToken", function(accounts) {
       }); */
   });
 
-  it("transfers ownership of tokens", function() {
-    return SebToken.deployed()
+  it("transfers ownership of tokens", async () => {
+    this.tokenInstance.transfer
+      .call(accounts[1], 999999999)
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+      });
+
+    const success = await this.tokenInstance.transfer.call(accounts[1], 250000);
+    assert(success, true, "it returns true if successful");
+
+    const receipt = await this.tokenInstance.transfer(accounts[1], 250000);
+    assert.equal(receipt.logs.length, 1, "there must be one event");
+    assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
+    assert.equal(receipt.logs[0].args._from, accounts[0], "logs sender account");
+    assert.equal(receipt.logs[0].args._to, accounts[1], "logs receiver account");
+    assert.equal(receipt.logs[0].args._value, 250000, "logs transfer amount");
+
+    const receiverBalance = await this.tokenInstance.balanceOf(accounts[1]);
+    assert(receiverBalance, 250000, "tokens not added to receiver account");
+
+    const senderBalance = await this.tokenInstance.balanceOf(accounts[0]);
+    assert(senderBalance, 750000, "tokens not deducted from sender account");
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         return tokenInstance.transfer.call(accounts[1], 999999999);
@@ -76,7 +99,7 @@ contract("SebToken", function(accounts) {
       })
       .then(function(senderBalance) {
         assert(senderBalance, 750000, "tokens not deducted from sender account");
-      });
+      }); */
   });
 
   it("approves tokens for delegated transfer", function() {
