@@ -58,6 +58,7 @@ contract("SebToken", function(accounts) {
     const success = await this.tokenInstance.transfer.call(accounts[1], 250000);
     assert(success, true, "it returns true if successful");
 
+    // receipt contains events emitted
     const receipt = await this.tokenInstance.transfer(accounts[1], 250000);
     assert.equal(receipt.logs.length, 1, "there must be one event");
     assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
@@ -142,8 +143,14 @@ contract("SebToken", function(accounts) {
     fromAccount = accounts[2];
     toAccount = accounts[3];
     spenderAccount = accounts[4];
+
+    // Send init balance tokens to fromAccount
     await this.tokenInstance.transfer(fromAccount, 100, { from: accounts[0] });
+
+    // Approve spenderAccount to transfer max 10 tokens fromAccount -> toAccount
     await this.tokenInstance.approve(spenderAccount, 10, { from: fromAccount });
+
+    // Try transferFrom tokens more than fromAccount balance
     this.tokenInstance
       .transferFrom(fromAccount, toAccount, 999, { from: spenderAccount })
       .then(assert.fail)
@@ -157,6 +164,7 @@ contract("SebToken", function(accounts) {
         assert(error.message.indexOf("revert") >= 0, "error must contain revert");
       });
 
+    // Check if true returned
     const success = await this.tokenInstance.transferFrom.call(fromAccount, toAccount, 10, { from: spenderAccount });
     assert.equal(success, true);
 
