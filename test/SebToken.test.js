@@ -138,8 +138,45 @@ contract("SebToken", function(accounts) {
       }); */
   });
 
-  it("performs delegated transfers", function() {
-    return SebToken.deployed()
+  it("performs delegated transfers", async () => {
+    fromAccount = accounts[2];
+    toAccount = accounts[3];
+    spenderAccount = accounts[4];
+    await this.tokenInstance.transfer(fromAccount, 100, { from: accounts[0] });
+    await this.tokenInstance.approve(spenderAccount, 10, { from: fromAccount });
+    this.tokenInstance
+      .transferFrom(fromAccount, toAccount, 999, { from: spenderAccount })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+        // Try transferFrom tokens more than allowance
+        return tokenInstance.transferFrom(fromAccount, toAccount, 20, { from: spenderAccount });
+      })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "error must contain revert");
+      });
+
+    const success = await this.tokenInstance.transferFrom.call(fromAccount, toAccount, 10, { from: spenderAccount });
+    assert.equal(success, true);
+
+    const receipt = await this.tokenInstance.transferFrom(fromAccount, toAccount, 10, { from: spenderAccount });
+    assert.equal(receipt.logs.length, 1, "there must be one event");
+    assert.equal(receipt.logs[0].event, "Transfer", "must be Transfer event");
+    assert.equal(receipt.logs[0].args._from, fromAccount, "logs sender account");
+    assert.equal(receipt.logs[0].args._to, toAccount, "logs receiver account");
+    assert.equal(receipt.logs[0].args._value, 10, "logs transfer amount");
+
+    const senderBalance = await this.tokenInstance.balanceOf(fromAccount);
+    assert.equal(senderBalance.toNumber(), 90, "tokens not deducted from sender account");
+
+    const receiverBalance = await this.tokenInstance.balanceOf(toAccount);
+    assert.equal(receiverBalance.toNumber(), 10, "tokens not added to receiver account");
+
+    const allowance = await this.tokenInstance.allowance(fromAccount, spenderAccount);
+    assert.equal(allowance.toNumber(), 0, "allowance not updated");
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         fromAccount = accounts[2];
@@ -190,6 +227,6 @@ contract("SebToken", function(accounts) {
       })
       .then(function(allowance) {
         assert.equal(allowance.toNumber(), 0, "allowance not updated");
-      });
+      }); */
   });
 });
