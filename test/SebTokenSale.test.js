@@ -43,8 +43,44 @@ contract("SebTokenSale", function(accounts) {
       }); */
   });
 
-  it("facilitates buying tokens", function() {
-    return SebToken.deployed()
+  it("facilitates buying tokens", async () => {
+    // Provision some tokens for tokenSale contract
+    await this.tokenInstance.transfer(tokenSaleInstance.address, provisionedTokens, { from: admin });
+
+    const receipt = await this.tokenSaleInstance.buyTokens(numberOfTokens, { from: buyer, value: value });
+    assert.equal(receipt.logs.length, 1, "there must be one event");
+    assert.equal(receipt.logs[0].event, "Sell", "must be Sell event");
+    assert.equal(receipt.logs[0].args._buyer, buyer, "logs buyer account");
+    assert.equal(receipt.logs[0].args._numberOfTokens, numberOfTokens, "logs numberOfTokens");
+
+    const sold = await this.tokenSaleInstance.tokensSold();
+    assert.equal(sold.toNumber(), numberOfTokens, "tokensSold not equal to numberOfTokens bought");
+
+    // Check balance of buyer and tokenSale contract updated
+    const buyerBalance = await this.tokenInstance.balanceOf(buyer);
+    assert.equal(buyerBalance, numberOfTokens, "balanceOf buyer not updated");
+
+    const contractBalance = await this.tokenInstance.balanceOf(tokenSaleInstance.address);
+    assert.equal(contractBalance, provisionedTokens - numberOfTokens, "balanceOf tokenSale not updated");
+
+    // Try selling tokens different from actual ether value
+    this.tokenSaleInstance
+      .buyTokens(numberOfTokens, { from: buyer, value: 1 })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "tokens and value must be equal");
+      });
+
+    // Try buying more tokens than provisionedTokens
+    this.tokenSaleInstance
+      .buyTokens(800000, { from: buyer, value: value })
+      .then(assert.fail)
+      .catch(function(error) {
+        // console.log(error.message);
+        assert(error.message.indexOf("revert") >= 0, "cannot buy more tokens than provisionedTokens");
+      });
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         return SebTokenSale.deployed();
@@ -88,6 +124,7 @@ contract("SebTokenSale", function(accounts) {
       .catch(function(error) {
         // console.log(error.message);
         assert(error.message.indexOf("revert") >= 0, "cannot buy more tokens than provisionedTokens");
+      }); */
       });
   });
 
