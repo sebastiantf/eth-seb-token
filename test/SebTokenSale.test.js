@@ -2,8 +2,11 @@ const SebToken = artifacts.require("./SebToken.sol");
 const SebTokenSale = artifacts.require("./SebTokenSale.sol");
 
 contract("SebTokenSale", function(accounts) {
-  var tokenInstance;
-  var tokenSaleInstance;
+  before(async () => {
+    this.tokenInstance = await SebToken.deployed();
+    this.tokenSaleInstance = await SebTokenSale.deployed();
+  });
+
   var tokenPrice = 1000000000000000; // Token price in wei = 0.001 ETH
   var numberOfTokens = 10;
   var buyer = accounts[1];
@@ -12,8 +15,17 @@ contract("SebTokenSale", function(accounts) {
   var provisionedTokens = 750000;
   var admin = accounts[0];
 
-  it("deploys and initializes correctly", function() {
-    return SebTokenSale.deployed()
+  it("deploys and initializes correctly", async () => {
+    const address = await this.tokenSaleInstance.address;
+    assert.notEqual(address, "0x0", "does not have contract address");
+
+    const tokenContractAddress = await this.tokenSaleInstance.tokenContract();
+    assert.notEqual(tokenContractAddress, "0x0", "does not have token contract reference/address");
+
+    const price = await this.tokenSaleInstance.tokenPrice();
+    assert.equal(price, tokenPrice, "token price is not set");
+
+    /* return SebTokenSale.deployed()
       .then(function(i) {
         tokenSaleInstance = i;
         return tokenSaleInstance.address;
@@ -28,7 +40,7 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(function(price) {
         assert.equal(price, tokenPrice, "token price is not set");
-      });
+      }); */
   });
 
   it("facilitates buying tokens", function() {
