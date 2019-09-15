@@ -125,11 +125,28 @@ contract("SebTokenSale", function(accounts) {
         // console.log(error.message);
         assert(error.message.indexOf("revert") >= 0, "cannot buy more tokens than provisionedTokens");
       }); */
-      });
   });
 
-  it("ends token sale", function() {
-    return SebToken.deployed()
+  it("ends token sale", async () => {
+    // Trying endSale by other than admin
+    this.tokenSaleInstance
+      .endSale({ from: buyer })
+      .then(assert.fail)
+      .catch(function(error) {
+        assert(error.message.indexOf("revert") >= 0, "only admin can end sale");
+      });
+
+    // Try endSale by admin
+    await this.tokenSaleInstance.endSale({ from: admin });
+
+    const adminBalance = await this.tokenInstance.balanceOf(admin);
+    assert.equal(adminBalance.toNumber(), 999990, "remaining tokens not returned to admin");
+
+    // Check that the contract has no balance
+    const contractBalance = await this.tokenInstance.balanceOf(tokenSaleInstance.address);
+    assert.equal(contractBalance.toNumber(), 0);
+
+    /* return SebToken.deployed()
       .then(function(i) {
         tokenInstance = i;
         return SebTokenSale.deployed();
@@ -155,6 +172,6 @@ contract("SebTokenSale", function(accounts) {
       })
       .then(function(contractBalance) {
         assert.equal(contractBalance.toNumber(), 0);
-      });
+      }); */
   });
 });
